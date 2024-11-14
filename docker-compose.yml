@@ -1,0 +1,46 @@
+version: '3'
+services:
+  # Nuxt 3 App Service
+  nuxt-app:
+    build: .
+    container_name: basic-trackr-web
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+      - puppeteer
+
+  # Postgres Database
+  db:
+    image: postgres:17
+    container_name: basic-trackr-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: prisma
+      POSTGRES_PASSWORD: prisma
+      POSTGRES_DB: prisma
+    volumes:
+      - prisma-data:/var/lib/postgresql/data
+
+  # Puppeteer Service
+  puppeteer:
+    image: ghcr.io/puppeteer/puppeteer:latest
+    container_name: basic-trackr-puppeteer
+    environment:
+      - BROWSER_NAME=chromium
+      - BROWSERS_URL=https://chromedriver.chromium.org/downloads
+    ports:
+      - "9222:9222"
+
+  # Nginx Reverse Proxy (optional)
+  # nginx:
+  #   image: nginx
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+volumes:
+  # Docker Volumeware for Prisma
+  prisma-data:
